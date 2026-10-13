@@ -161,13 +161,18 @@ async function pathExists(path: string) {
     }
 }
 
+// path.resolve does not expand "~", so a setting like "~/Desktop/yomitan" would resolve under the cwd.
+function resolveUserPath(path: string) {
+    return resolve(path.replace(/^~(?=$|[\\/])/, homedir()));
+}
+
 async function resolveArtifact() {
     const configured = String(pluginSettings().localBuildPath ?? "").trim();
     const candidates = [
         configured,
         process.env.YOMITAN_VENCORD_BUILD ?? "",
         join(homedir(), "Desktop", "yomitan", "builds", DEFAULT_BUILD_DIRECTORY)
-    ].filter(Boolean).map(path => resolve(path));
+    ].filter(Boolean).map(resolveUserPath);
 
     for (const candidate of candidates) {
         const directory = basename(candidate) === DEFAULT_BUILD_DIRECTORY
@@ -222,7 +227,7 @@ async function resolveNodeExecutable() {
     // Every candidate is verified rather than trusting the first one that exists.
     const candidates = [configured, process.env.YOMITAN_NODE ?? "", onPath ?? "", ...platformFallbacks]
         .filter(Boolean)
-        .map(path => resolve(path));
+        .map(resolveUserPath);
     let foundOutdated = false;
     for (const candidate of candidates) {
         if (!await pathExists(candidate)) continue;

@@ -10,7 +10,7 @@ import ErrorBoundary from "@components/ErrorBoundary";
 import { Devs } from "@utils/index";
 import definePlugin, { OptionType, PluginNative } from "@utils/types";
 import { findComponentByCodeLazy } from "@webpack";
-import { Menu, Popout, showToast, Toasts, useEffect, useRef, useState } from "@webpack/common";
+import { Menu, Popout, showToast, useEffect, useRef, useState } from "@webpack/common";
 
 const Native = VencordNative.pluginHelpers.Yomitan as PluginNative<typeof import("./native")>;
 
@@ -18,7 +18,7 @@ const PanelButton = findComponentByCodeLazy(".GREEN,positionKeyStemOverride:");
 
 async function runNativeAction(action: () => Promise<string | null>, failurePrefix: string, success: string) {
     const error = await action();
-    showToast(error ? `${failurePrefix}: ${error}` : success, error ? Toasts.Type.FAILURE : Toasts.Type.SUCCESS);
+    showToast(error ? `${failurePrefix}: ${error}` : success, error ? "failure" : "success");
 }
 
 function LanguageIcon() {
@@ -42,7 +42,7 @@ function LanguageMenu({ closePopout }: { closePopout: () => void; }) {
             setCurrent(result.current);
         }).catch(() => {
             setProfiles([]);
-            showToast("Failed to load Yomitan profiles", Toasts.Type.FAILURE);
+            showToast("Failed to load Yomitan profiles", "failure");
         });
     }, []);
 
@@ -64,9 +64,9 @@ function LanguageMenu({ closePopout }: { closePopout: () => void; }) {
                             setCurrent(index);
                             const error = await Native.switchYomitanProfile(index);
                             if (error) {
-                                showToast(`Failed to switch Yomitan profile: ${error}`, Toasts.Type.FAILURE);
+                                showToast(`Failed to switch Yomitan profile: ${error}`, "failure");
                             } else {
-                                showToast(`Switched Yomitan profile to ${name}`, Toasts.Type.SUCCESS);
+                                showToast(`Switched Yomitan profile to ${name}`, "success");
                             }
                         }}
                     />
